@@ -153,11 +153,10 @@ if (prefersReduced) {
   fxCanvas.style.display = 'none';
 }
 
-// Resize canvas
+// Resize canvas + card rect cache
 function resizeCanvas(){
   const w = window.innerWidth;
   const h = window.innerHeight;
-  if (w === width && h === height) return;
   width = w; height = h;
   fxCanvas.width = Math.floor(width * dpr);
   fxCanvas.height = Math.floor(height * dpr);
@@ -169,25 +168,26 @@ function resizeCanvas(){
 function updateCardRect(){
   const card = document.getElementById('glassCard');
   const r = card.getBoundingClientRect();
-  // store as plain object
   cardRect = { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
 }
+window.addEventListener('resize', resizeCanvas);
+setInterval(updateCardRect, 1000);
 
-window.addEventListener('resize', () => {
-  resizeCanvas();
-});
-setInterval(updateCardRect, 1000); // refresh approx every second
-
-// Helpers
+// Random helpers
 function rand(a,b){ return a + Math.random()*(b-a); }
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function clamp(x,a,b){ return Math.max(a, Math.min(b, x)); }
 function smoothstep(edge0, edge1, x){
+  const t = clamp((x - edge0) / (edge1 - edge1 + (edge1-edge0)), 0, 1); // guard
+  const tt = clamp((x - edge0) / (edge1 - edge0), 0, 1);
+  return tt * tt * (3 - 2 * tt);
+}
+function smooth(edge0, edge1, x){
   const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
   return t * t * (3 - 2 * t);
 }
 
-// Pre-render sprites (hearts + petals) to offscreen canvases
+// Palette (with slight jitter per particle)
 const palette = [
   '#ff8fb1', // blush
   '#f06292', // raspberry
@@ -195,6 +195,7 @@ const palette = [
   '#ffe7f0'  // ivory
 ];
 
+// Offscreen sprite makers
 function makeOffscreen(w,h, draw){
   const c = document.createElement('canvas');
   c.width = w; c.height = h;
@@ -206,7 +207,6 @@ function drawHeart(ctx, w, h, color){
   ctx.clearRect(0,0,w,h);
   ctx.fillStyle = color;
   ctx.beginPath();
-  // parametric heart shape
   const s = Math.min(w,h);
   const x0 = w/2, y0 = h/2 + s*0.06;
   ctx.moveTo(x0, y0);
@@ -217,82 +217,110 @@ function drawHeart(ctx, w, h, color){
 }
 function drawPetal(ctx, w, h, color){
   ctx.clearRect(0,0,w,h);
+  // base petal
   ctx.fillStyle = color;
   ctx.beginPath();
   const s = Math.min(w,h);
   const x0 = w/2, y0 = h/2;
-  ctx.ellipse(x0, y0, s*0.35, s*0.6, -0.5, 0, Math.PI*2);
+  ctx.ellipse(x0, y0, s*0.36, s*0.62, -0.45, 0, Math.PI*2);
   ctx.fill();
-
-  // add gentle gradient highlight
-  const g = ctx.createRadialGradient(x0 - s*0.1, y0 - s*0.2, 0, x0, y0, s*0.8);
-  g.addColorStop(0, 'rgba(255,255,255,0.35)');
+  // soft ridge highlight
+  const g = ctx.createLinearGradient(x0 - s*0.2, y0 - s*0.3, x0 + s*0.2, y0 + s*0.3);
+  g.addColorStop(0, 'rgba(255,255,255,0.25)');
+  g.addColorStop(0.45, 'rgba(255,255,255,0.08)');
   g.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = g;
   ctx.beginPath();
-  ctx.ellipse(x0, y0, s*0.35, s*0.6, -0.5, 0, Math.PI*2);
+  ctx.ellipse(x0, y0, s*0.34, s*0.58, -0.45, 0, Math.PI*2);
   ctx.fill();
 }
 
+// Build sprite set (hearts fewer/smaller feel more tasteful)
 const sprites = [];
 (function buildSprites(){
-  const baseSizes = [28, 34, 40]; // base sprite size (then scaled)
+  const baseSizes = [28, 34, 40];
   for (const c of palette){
     for (const s of baseSizes){
-      sprites.push({ type:'heart',  img: makeOffscreen(s, s, (x,w,h)=>drawHeart(x,w,h,c)),  w:s, h:s });
-      sprites.push({ type:'petal',  img: makeOffscreen(s, s, (x,w,h)=>drawPetal(x,w,h,c)),  w:s, h:s });
+      sprites.push({ type:'petal', img: makeOffscreen(s, s, (x,w,h)=>drawPetal(x,w,h,c)), w:s, h:s });
+    }
+  }
+  // Hearts (less frequent sizes)
+  const heartSizes = [24, 30];
+  for (const c of palette.slice(0,3)){
+    for (const s of heartSizes){
+      sprites.push({ type:'heart', img: makeOffscreen(s, s, (x,w,h)=>drawHeart(x,w,h,c)), w:s, h:s });
     }
   }
 })();
 
-// Particle factory
-function makeParticle(bottomSpawn=false){
+// Depth layers
+const LAYERS = [
+  { name:'far',  scale: 0.75, speed: 0.8,  alpha: 0.55 },
+  { name:'mid',  scale: 1.00, speed: 1.0,  alpha: 0.75 },
+  { name:'near', scale: 1.25, speed: 1.2,  alpha: 0.90, blur: 0.7 }
+];
+
+// Particle factory (edge-based emitter + ambient rare spawn)
+function spawnFromEdge(){
+  const edge = Math.floor(Math.random()*4); // 0 top, 1 right, 2 bottom, 3 left
+  let x, y, vx, vy;
+  const margin = 40;
+  switch(edge){
+    case 0: // top → down
+      x = rand(-margin, width+margin); y = -margin; vx = rand(-0.03,0.03); vy = rand(0.02,0.05);
+      break;
+    case 1: // right → left
+      x = width+margin; y = rand(-margin, height+margin); vx = rand(-0.06,-0.02); vy = rand(-0.01,0.03);
+      break;
+    case 2: // bottom → up
+      x = rand(-margin, width+margin); y = height+margin; vx = rand(-0.03,0.03); vy = rand(-0.05,-0.02);
+      break;
+    default: // left → right
+      x = -margin; y = rand(-margin, height+margin); vx = rand(0.02,0.06); vy = rand(-0.01,0.03);
+  }
+  return { x, y, vx, vy };
+}
+function makeParticle(burst=false){
   const isMobile = window.innerWidth < 560;
-  const subtleCount = isMobile ? 12 : 20; // we’ll use only ~this many total
-  // type mix ~70% petals, 30% hearts
-  const type = Math.random() < 0.7 ? 'petal' : 'heart';
-  const matches = sprites.filter(s => s.type === type);
-  const sprite = pick(matches);
+  const type = Math.random() < 0.8 ? 'petal' : 'heart'; // 80/20
+  const options = sprites.filter(s => s.type===type);
+  const sprite = pick(options);
 
-  const size = rand(0.75, 1.25); // scale multiplier
-  const x = bottomSpawn ? (width*0.5 + rand(-width*0.1, width*0.1)) : rand(0, width);
-  const y = bottomSpawn ? (height + rand(10, 60)) : rand(-60, height*0.2);
+  const layer = pick(LAYERS);
+  const baseScale = rand(0.85, 1.15) * layer.scale;
+  const { x, y, vx, vy } = burst ? { x: width*0.5 + rand(-width*0.2,width*0.2), y: height+20, vx: rand(-0.04,0.04), vy: rand(-0.06,-0.03) }
+                                 : spawnFromEdge();
 
+  // “Breeze” (3 layered sines) + flutter (wobble/flip)
   return {
-    sprite,
-    x, y,
-    scale: size,
-    vy: rand(14, 24) / 100,        // vertical drift (px/ms)
-    swayA: rand(8, 22),            // sway amplitude (px)
-    swayW: rand(0.001, 0.0022),    // sway angular speed
-    swayT: rand(0, Math.PI*2),     // sway phase
-    rot: rand(0, Math.PI*2),       // rotation
-    rotV: rand(-0.0012, 0.0012),   // rotation speed
-    alpha: rand(0.65, 0.95),       // base alpha
+    sprite, layer,
+    x, y, vx, vy,
+    scale: baseScale,
+    swayA1: rand(6,18),   swayW1: rand(0.0006, 0.0016),  phase1: rand(0,Math.PI*2),
+    swayA2: rand(2,7),    swayW2: rand(0.0011, 0.0022),  phase2: rand(0,Math.PI*2),
+    swayA3: rand(1,4),    swayW3: rand(0.0018, 0.0030),  phase3: rand(0,Math.PI*2),
+    rot: rand(0,Math.PI*2), rotV: rand(-0.0012,0.0012),
+    flutter: rand(0.6, 1.0), // wobble strength
+    alpha: rand(0.75, 1.0) * layer.alpha
   };
 }
 
-// Build initial particle field
+// Build initial field
 function initParticles(){
   particles = [];
   const isMobile = window.innerWidth < 560;
-  const count = isMobile ? 12 : 20; // Subtle density
-  for (let i=0;i<count;i++){
-    particles.push(makeParticle(false));
-  }
+  const count = isMobile ? 12 : 20; // Subtle
+  for (let i=0;i<count;i++){ particles.push(makeParticle(false)); }
 }
 function bloomParticles(n=8){
-  for (let i=0;i<n;i++){
-    particles.push(makeParticle(true));
-  }
+  for (let i=0;i<n;i++){ particles.push(makeParticle(true)); }
 }
 
-// Opacity modulation over the glass card
-// We’ll dim when particle is inside/near the card rect with smooth transition
+// Opacity modulation over the glass card (dim when crossing it)
 function opacityOverCard(px, py, baseAlpha){
   if (!cardRect) return baseAlpha;
 
-  const falloff = 22; // fade range around the card edges
+  const falloff = 24; // fade range around card edges
   const inner = cardRect;
   const outer = {
     left: inner.left - falloff,
@@ -301,65 +329,87 @@ function opacityOverCard(px, py, baseAlpha){
     bottom: inner.bottom + falloff
   };
 
-  // Outside outer → no dim
   if (px < outer.left || px > outer.right || py < outer.top || py > outer.bottom) {
     return baseAlpha;
   }
 
-  // Inside inner → minimum alpha
   const minAlpha = baseAlpha * 0.32;
 
-  // In the band between inner and outer → smooth ramp
   let distToEdge = 0;
   if (px < inner.left) distToEdge = inner.left - px;
   else if (px > inner.right) distToEdge = px - inner.right;
   if (py < inner.top) distToEdge = Math.max(distToEdge, inner.top - py);
   else if (py > inner.bottom) distToEdge = Math.max(distToEdge, py - inner.bottom);
 
-  // If truly inside (distToEdge == 0), return min
   if (distToEdge === 0) return minAlpha;
 
-  // Map 0..falloff → minAlpha..baseAlpha
-  const t = smoothstep(0, falloff, distToEdge);
+  const t = smooth(0, falloff, distToEdge);
   return minAlpha + (baseAlpha - minAlpha) * t;
 }
 
-// Animation loop
+// Canvas sizing & start
+function startFX(){
+  resizeCanvas();
+  updateCardRect();
+  initParticles();
+  if (!prefersReduced){
+    requestAnimationFrame(loop);
+  }
+}
+startFX();
+
+// Main loop
 function loop(ts){
-  if (!running){ return; }
+  if (!running) return;
   if (!lastTs) lastTs = ts;
-  const dt = ts - lastTs;
+  const dt = ts - lastTs; // ms
   lastTs = ts;
 
   ctx.clearRect(0,0,width,height);
 
-  // draw each particle
   for (let i=particles.length-1; i>=0; i--){
     const p = particles[i];
 
-    // update
-    p.swayT += p.swayW * dt;
-    p.x += Math.sin(p.swayT) * (p.swayA * dt/1000);
-    p.y += -p.vy * dt; // move upward (negative y)
+    // Layered breeze sway
+    const sway = Math.sin(p.phase1 += p.swayW1*dt)*p.swayA1
+               + Math.sin(p.phase2 += p.swayW2*dt)*p.swayA2
+               + Math.sin(p.phase3 += p.swayW3*dt)*p.swayA3;
 
+    // Positions
+    p.x += (p.vx * p.layer.speed) * dt + (sway * dt/1000);
+    p.y += (p.vy * p.layer.speed) * dt;
+
+    // Rotation + flutter (scale wobble)
     p.rot += p.rotV * dt;
+    const wob = Math.sin((p.phase1 + p.phase2)*0.5) * 0.12 * p.flutter; // -0.12..0.12
+    const scaleX = p.scale * (1 + wob);
+    const scaleY = p.scale * (1 - wob*0.6);
 
-    // recycle if out of view
-    if (p.y < -80){
-      // replace with new particle from bottom or top
-      particles[i] = makeParticle(true);
+    // Recycle if out of view with margin
+    const margin = 80;
+    if (p.x < -margin || p.x > width + margin || p.y < -margin || p.y > height + margin){
+      particles[i] = makeParticle(false);
       continue;
     }
 
-    // draw
-    const w = p.sprite.w * p.scale;
-    const h = p.sprite.h * p.scale;
+    // Alpha modulation over card + slight lightness oscillation
+    const baseAlpha = p.alpha * (0.9 + 0.1*Math.sin(p.phase2*0.7));
+    const alpha = opacityOverCard(p.x, p.y, baseAlpha);
 
-    // Compute alpha modulation over card
-    const alpha = opacityOverCard(p.x, p.y, p.alpha);
+    // Draw
+    const w = p.sprite.w * scaleX;
+    const h = p.sprite.h * scaleY;
 
     ctx.save();
     ctx.globalAlpha = alpha;
+
+    // tiny blur for near layer on occasional gusts (GPU filter; keep subtle)
+    if (p.layer.blur && Math.abs(sway) > 10){
+      ctx.filter = `blur(${p.layer.blur}px)`;
+    } else {
+      ctx.filter = 'none';
+    }
+
     ctx.translate(p.x, p.y);
     ctx.rotate(p.rot);
     ctx.drawImage(p.sprite.img, -w/2, -h/2, w, h);
@@ -380,10 +430,8 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// Init
-resizeCanvas();
-initParticles();
-updateCardRect();
-if (!prefersReduced){
-  requestAnimationFrame(loop);
-}
+// Handle DPR changes (zoom)
+window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`).addEventListener?.('change', ()=>{
+  dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  resizeCanvas();
+});
