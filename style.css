@@ -172,7 +172,7 @@ body{
 .btn:active{ transform: translateY(1px); filter: brightness(.97); }
 .btn__icon{ transform: translateY(-1px); }
 
-/* ===== Slideshow ribbon below the card ===== */
+/* ===== Slideshow ribbon (below the card) ===== */
 .gallery{
   width: min(96vw, 780px);
   position: relative;
@@ -182,37 +182,42 @@ body{
   border: 1px solid rgba(255,255,255,.55);
   z-index: 1;
 
-  /* Keep a pleasing aspect ratio but don't let it grow too tall */
+  /* Responsive size that never gets too tall */
   aspect-ratio: 16 / 7;
   max-height: clamp(140px, 28vh, 300px);
   margin-bottom: 8px;
 }
+
 .slide{
   position: absolute; inset: 0;
   opacity: 0;
-  transition: opacity 1100ms ease-in-out;
+  /* smoother crossfade + silkier easing */
+  transition: opacity 1600ms cubic-bezier(.22,.61,.36,1);
   will-change: opacity, transform;
+  backface-visibility: hidden;
 }
 .slide.active{ opacity: 1; }
+
 .slide img{
   width: 100%; height: 100%;
   object-fit: cover;            /* no stretching */
   object-position: center;      /* nice centering */
   transform-origin: center;
-  transform: scale(1.04);       /* subtle Ken Burns start */
+  transform: scale(1.03);       /* gentler Ken Burns start */
+  will-change: transform;
 }
 
-/* Ken Burns animations */
-.slide.active img{ animation: kb-zoom 8s ease-in-out forwards; }
+/* Ken Burns animations (longer & softer) */
+.slide.active img{ animation: kb-zoom 12s ease-in-out forwards; }
 .slide.alt.active img{ animation-name: kb-zoom-alt; }
 
 @keyframes kb-zoom{
-  0%   { transform: scale(1.06) translate(0,0) }
-  100% { transform: scale(1.14) translate(2%, -2%) }
+  0%   { transform: scale(1.03) translate(0,0) }
+  100% { transform: scale(1.10) translate(1.5%, -1.5%) }
 }
 @keyframes kb-zoom-alt{
-  0%   { transform: scale(1.06) translate(0,0) }
-  100% { transform: scale(1.14) translate(-2%, 2%) }
+  0%   { transform: scale(1.03) translate(0,0) }
+  100% { transform: scale(1.10) translate(-1.5%, 1.5%) }
 }
 
 /* Pause effect (used by JS) */

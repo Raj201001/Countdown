@@ -1,6 +1,6 @@
 /* ========= Countdown (with ms) ========= */
 // Local device midnight for Nov 26, 2025.
-// For exact 00:00 IST regardless of device timezone, use:
+// To force exact 00:00 IST regardless of device timezone, use:
 // const TARGET = new Date("2025-11-25T18:30:00Z").getTime();
 const TARGET = new Date("2025-11-26T00:00:00").getTime();
 const TICK_MS = 25;
@@ -76,61 +76,78 @@ toggleBtn.addEventListener("click", async () => {
 const gallery = document.getElementById("gallery");
 const slides  = Array.from(gallery.querySelectorAll(".slide"));
 
-let slideIndex = 0;
-const FADE_MS  = 1100;   // must match CSS transition
-const SHOW_MS  = 6000;   // visible time per slide (excluding fade overlap)
-let slideTimer = null;
+let idx = 0;
+const FADE_MS    = 1600;  // matches CSS transition
+const DISPLAY_MS = 6000;  // time fully visible before switching
+let playTimer    = null;
+let playing      = false;
 
-function showSlide(next){
-  slides[slideIndex].classList.remove("active");
-  slideIndex = (typeof next === "number") ? next : (slideIndex + 1) % slides.length;
-
-  // Alternate direction by toggling .alt class (applies kb-zoom-alt)
-  slides[slideIndex].classList.toggle("alt", slideIndex % 2 === 1);
-
-  // Activate next
-  slides[slideIndex].classList.add("active");
+function activate(nextIndex){
+  slides[idx].classList.remove("active");
+  idx = (typeof nextIndex === "number") ? nextIndex : (idx + 1) % slides.length;
+  // Alternate pan direction for variety
+  slides[idx].classList.toggle("alt", idx % 2 === 1);
+  slides[idx].classList.add("active");
 }
 
-function startSlideshow(){
-  // safety: if no slides, bail
-  if (!slides.length) return;
+function scheduleNext(){
+  playTimer = setTimeout(() => {
+    if (!gallery.classList.contains("paused")) {
+      activate();
+    }
+    scheduleNext(); // chain again
+  }, DISPLAY_MS);
+}
 
-  // ensure one active
-  if (!slides.some(s => s.classList.contains("active"))){
+function startShow(){
+  if (!slides.length || playing) return;
+  if (!slides.some(s => s.classList.contains("active"))) {
     slides[0].classList.add("active");
   }
-
-  // auto-advance
-  slideTimer = setInterval(() => {
-    if (!gallery.classList.contains("paused")){
-      showSlide();
-    }
-  }, SHOW_MS);
+  playing = true;
+  scheduleNext();
 }
-
-function pauseSlideshow(){
-  gallery.classList.add("paused");
-}
-function resumeSlideshow(){
-  gallery.classList.remove("paused");
+function stopShow(){
+  playing = false;
+  clearTimeout(playTimer);
 }
 
 // Pause on hover (desktop)
-gallery.addEventListener("mouseenter", pauseSlideshow);
-gallery.addEventListener("mouseleave", resumeSlideshow);
+gallery.addEventListener("mouseenter", () => gallery.classList.add("paused"));
+gallery.addEventListener("mouseleave", () => gallery.classList.remove("paused"));
 
 // Pause on touch hold (mobile)
-let touchPauseTimeout;
+let touchTimer = null;
 gallery.addEventListener("touchstart", () => {
-  // immediate pause
-  pauseSlideshow();
-  // auto-resume after short delay when touch ends
-}, {passive:true});
+  gallery.classList.add("paused");
+  clearTimeout(touchTimer);
+}, { passive:true });
 gallery.addEventListener("touchend", () => {
-  // resume after a slight delay to avoid accidental resumes
-  clearTimeout(touchPauseTimeout);
-  touchPauseTimeout = setTimeout(resumeSlideshow, 300);
+  clearTimeout(touchTimer);
+  touchTimer = setTimeout(() => gallery.classList.remove("paused"), 250);
+}, { passive:true });
+
+// Pause when tab is hidden (saves battery, prevents jump)
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) stopShow(); else startShow();
 });
 
-startSlideshow();
+// Kick off slideshow
+startShow();
+
+/* ===== Add more images? =====
+Option A: add more <figure class="slide"><img src="..."></figure> in index.html.
+Option B (JS-managed):
+--------------------------------
+const imageList = ["photo1.jpg","photo2.jpg","photo3.jpg","photo4.jpg"];
+if (!gallery.querySelector(".slide")) {
+  gallery.innerHTML = imageList.map((src,i)=>`
+    <figure class="slide${i===0?' active alt':''}">
+      <img src="${src}" alt="" ${i===0?'loading="eager"':'loading="lazy"'} decoding="async"/>
+    </figure>
+  `).join("");
+}
+const slides = Array.from(gallery.querySelectorAll(".slide"));
+startShow();
+--------------------------------
+*/
