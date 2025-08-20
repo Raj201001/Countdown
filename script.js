@@ -1,41 +1,84 @@
-// Countdown
-function updateCountdown() {
-  const weddingDate = new Date("Nov 26, 2025 00:00:00").getTime();
-  const now = new Date().getTime();
-  const diff = weddingDate - now;
+// ======================
+// Config
+// ======================
 
-  if (diff <= 0) {
-    document.getElementById("days").innerText = 0;
-    document.getElementById("hours").innerText = 0;
-    document.getElementById("minutes").innerText = 0;
-    document.getElementById("seconds").innerText = 0;
-    return;
-  }
+// Use local device time for 26 Nov 2025, 00:00:00 (device timezone-safe)
+const TARGET = new Date("2025-11-26T00:00:00").getTime();
 
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+// Update frequency (ms). 25ms is smooth + battery friendly.
+const TICK_MS = 25;
 
-  document.getElementById("days").innerText = days;
-  document.getElementById("hours").innerText = hours;
-  document.getElementById("minutes").innerText = minutes;
-  document.getElementById("seconds").innerText = seconds;
-}
+// ======================
+// Elements
+// ======================
+const elDays   = document.getElementById("days");
+const elHours  = document.getElementById("hours");
+const elMins   = document.getElementById("minutes");
+const elSecs   = document.getElementById("seconds");
+const elMillis = document.getElementById("millis");
 
-setInterval(updateCountdown, 1000);
-updateCountdown();
-
-// Music toggle
 const music = document.getElementById("bgMusic");
 const toggleBtn = document.getElementById("toggleMusic");
 
-toggleBtn.addEventListener("click", () => {
-  if (music.paused) {
-    music.play();
-    toggleBtn.textContent = "⏸ Pause Music";
-  } else {
-    music.pause();
-    toggleBtn.textContent = "🎵 Toggle Music";
+// ======================
+// Countdown
+// ======================
+let timerId = null;
+
+function render(diffMs) {
+  if (diffMs <= 0) {
+    elDays.textContent   = "0";
+    elHours.textContent  = "00";
+    elMins.textContent   = "00";
+    elSecs.textContent   = "00";
+    elMillis.textContent = "000";
+    clearInterval(timerId);
+    return;
+  }
+
+  const days = Math.floor(diffMs / 86_400_000); // 1000*60*60*24
+  const remDay = diffMs % 86_400_000;
+
+  const hours = Math.floor(remDay / 3_600_000);
+  const remHr = remDay % 3_600_000;
+
+  const mins = Math.floor(remHr / 60_000);
+  const remMin = remHr % 60_000;
+
+  const secs = Math.floor(remMin / 1_000);
+  const millis = Math.floor(remMin % 1_000);
+
+  elDays.textContent   = String(days);
+  elHours.textContent  = String(hours).padStart(2, "0");
+  elMins.textContent   = String(mins).padStart(2, "0");
+  elSecs.textContent   = String(secs).padStart(2, "0");
+  elMillis.textContent = String(millis).padStart(3, "0");
+}
+
+function tick() {
+  const now = Date.now();
+  render(TARGET - now);
+}
+
+// Start automatically on page load
+timerId = setInterval(tick, TICK_MS);
+tick(); // immediate first paint
+
+// ======================
+// Music Toggle (play/pause on user tap)
+// ======================
+toggleBtn.addEventListener("click", async () => {
+  try {
+    if (music.paused) {
+      await music.play();            // user gesture → allowed
+      toggleBtn.textContent = "⏸ Pause Music";
+    } else {
+      music.pause();
+      toggleBtn.textContent = "🎵 Play Music";
+    }
+  } catch (err) {
+    // In case of any browser restriction
+    console.log("Music play blocked:", err);
+    toggleBtn.textContent = "🎵 Play Music";
   }
 });

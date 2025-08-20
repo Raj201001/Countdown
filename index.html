@@ -1,28 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wedding Countdown</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>Rituraj & Nadi — Forever Begins 26th November 2025</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="countdown-container">
-    <h1>Countdown to 26th November 2025</h1>
+  <main class="card">
+    <h1>Rituraj ❤️ Nadi — Forever Begins 26th November 2025</h1>
     <div class="ring">💍</div>
 
-    <div class="timer">
-      <div><span id="days">0</span><p>Days</p></div>
-      <div><span id="hours">0</span><p>Hours</p></div>
-      <div><span id="minutes">0</span><p>Minutes</p></div>
-      <div><span id="seconds">0</span><p>Seconds</p></div>
-    </div>
+    <section id="countdown" aria-live="polite">
+      <div class="unit">
+        <span id="days" class="num">0</span>
+        <span class="label">Days</span>
+      </div>
+      <div class="unit">
+        <span id="hours" class="num">00</span>
+        <span class="label">Hours</span>
+      </div>
+      <div class="unit">
+        <span id="minutes" class="num">00</span>
+        <span class="label">Minutes</span>
+      </div>
+      <div class="unit">
+        <span id="seconds" class="num">00</span>
+        <span class="label">Seconds</span>
+      </div>
+      <div class="unit">
+        <span id="millis" class="num small">000</span>
+        <span class="label">ms</span>
+      </div>
+    </section>
 
-    <p class="quote">"Every love story is beautiful, but ours is my favorite ❤️"</p>
+    <p class="quote">“Every love story is beautiful, but ours is my favorite.” ❤️</p>
 
-    <button id="toggleMusic">🎵 Toggle Music</button>
-    <audio id="bgMusic" src="music.mp3" loop></audio>
-  </div>
+    <button id="toggleMusic" type="button">🎵 Play Music</button>
+    <audio id="bgMusic" src="music.mp3" preload="auto" loop></audio>
+  </main>
 
   <script src="script.js"></script>
 </body>
