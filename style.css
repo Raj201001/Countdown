@@ -1,29 +1,68 @@
 body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(to right, #ff9a9e, #fad0c4);
+      font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #ff9a9e, #fad0c4);
           display: flex;
             justify-content: center;
               align-items: center;
                 height: 100vh;
                   margin: 0;
-                    color: #333;
-                    }
+                  }
 
-                    .container {
-                      text-align: center;
-                        background: white;
-                          padding: 30px;
-                            border-radius: 20px;
-                              box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+                  .container {
+                    text-align: center;
+                      background: rgba(255, 255, 255, 0.9);
+                        padding: 40px;
+                          border-radius: 20px;
+                            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+                              max-width: 500px;
                               }
 
                               h1 {
-                                margin-bottom: 20px;
-                                  color: #d6336c;
-                                  }
+                                margin-bottom: 25px;
+                                  color: #e63946;
+                                    font-size: 1.8rem;
+                                    }
 
-                                  #countdown {
-                                    font-size: 1.5rem;
-                                      font-weight: bold;
-                                      }
+                                    #countdown {
+                                      display: flex;
+                                        justify-content: space-around;
+                                          margin-bottom: 25px;
+                                          }
+
+                                          #countdown div {
+                                            text-align: center;
+                                            }
+
+                                            #countdown span {
+                                              display: block;
+                                                font-size: 2rem;
+                                                  color: #e63946;
+                                                  }
+
+                                                  #countdown small {
+                                                    font-size: 0.9rem;
+                                                      color: #444;
+                                                      }
+
+                                                      #quote {
+                                                        font-style: italic;
+                                                          margin-top: 20px;
+                                                            font-size: 1.2rem;
+                                                              color: #555;
+                                                              }
+
+                                                              .music-btn {
+                                                                margin-top: 20px;
+                                                                  padding: 10px 15px;
+                                                                    border: none;
+                                                                      border-radius: 10px;
+                                                                        background: #e63946;
+                                                                          color: white;
+                                                                            font-size: 1rem;
+                                                                              cursor: pointer;
+                                                                              }
+
+                                                                              .music-btn:hover {
+                                                                                background: #d62828;
+                                                                                }
 }

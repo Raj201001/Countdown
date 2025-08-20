@@ -22,4 +22,30 @@ function updateCountdown() {
                                           }
 
                                           setInterval(updateCountdown, 1);
+
+                                          // Romantic Quotes Rotation
+                                          const quotes = [
+                                            "Every love story is beautiful, but ours is my favorite ❤️",
+                                              "You are my today and all of my tomorrows 💕",
+                                                "Together is my favorite place to be 💑",
+                                                  "I still fall for you every single day 💘",
+                                                    "In your arms is where I belong 🌸"
+                                                    ];
+                                                    let quoteIndex = 0;
+
+                                                    function updateQuote() {
+                                                      document.getElementById("quote").innerText = quotes[quoteIndex];
+                                                        quoteIndex = (quoteIndex + 1) % quotes.length;
+                                                        }
+                                                        setInterval(updateQuote, 5000);
+
+                                                        // Music Toggle
+                                                        function toggleMusic() {
+                                                          const music = document.getElementById("bg-music");
+                                                            if (music.paused) {
+                                                                music.play();
+                                                                  } else {
+                                                                      music.pause();
+                                                                        }
+                                                                        }
 }

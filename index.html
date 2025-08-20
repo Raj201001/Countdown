@@ -3,20 +3,30 @@
 <head>
   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Our Countdown 💖</title>
+      <title>Our Countdown 💍</title>
         <link rel="stylesheet" href="style.css">
         </head>
         <body>
           <div class="container">
               <h1>Countdown to 26th November 2025 💍</h1>
                   <div id="countdown">
-                        <span id="days"></span> Days 
-                              <span id="hours"></span> Hours 
-                                    <span id="minutes"></span> Minutes 
-                                          <span id="seconds"></span> Seconds 
-                                                <span id="milliseconds"></span> ms
+                        <div><span id="days">0</span><small>Days</small></div>
+                              <div><span id="hours">0</span><small>Hours</small></div>
+                                    <div><span id="minutes">0</span><small>Minutes</small></div>
+                                          <div><span id="seconds">0</span><small>Seconds</small></div>
+                                                <div><span id="milliseconds">0</span><small>ms</small></div>
                                                     </div>
-                                                      </div>
-                                                        <script src="script.js"></script>
-                                                        </body>
-                                                        </html>
+
+                                                        <p id="quote">"Every love story is beautiful, but ours is my favorite ❤️"</p>
+
+                                                            <!-- Optional Music -->
+                                                                <audio id="bg-music" autoplay loop>
+                                                                      <source src="music.mp3" type="audio/mpeg">
+                                                                            Your browser does not support the audio tag.
+                                                                                </audio>
+                                                                                    <button onclick="toggleMusic()" class="music-btn">🔊 Toggle Music</button>
+                                                                                      </div>
+
+                                                                                        <script src="script.js"></script>
+                                                                                        </body>
+                                                                                        </html>
