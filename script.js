@@ -1,84 +1,90 @@
-// ======================
-// Config
-// ======================
-
-// Use local device time for 26 Nov 2025, 00:00:00 (device timezone-safe)
+// ===== Config =====
+// Local device midnight for Nov 26, 2025
+// (If you want exactly 00:00 IST regardless of device timezone,
+// use: new Date("2025-11-25T18:30:00Z").getTime())
 const TARGET = new Date("2025-11-26T00:00:00").getTime();
 
-// Update frequency (ms). 25ms is smooth + battery friendly.
+// Smooth without draining battery
 const TICK_MS = 25;
 
-// ======================
-// Elements
-// ======================
+// ===== Elements =====
 const elDays   = document.getElementById("days");
 const elHours  = document.getElementById("hours");
 const elMins   = document.getElementById("minutes");
 const elSecs   = document.getElementById("seconds");
 const elMillis = document.getElementById("millis");
 
-const music = document.getElementById("bgMusic");
-const toggleBtn = document.getElementById("toggleMusic");
+const music    = document.getElementById("bgMusic");
+const toggleBtn= document.getElementById("toggleMusic");
 
-// ======================
-// Countdown
-// ======================
+// Keep previous numbers to animate only when changed
+let prev = { d:null, h:null, m:null, s:null, ms:null };
 let timerId = null;
 
-function render(diffMs) {
-  if (diffMs <= 0) {
-    elDays.textContent   = "0";
-    elHours.textContent  = "00";
-    elMins.textContent   = "00";
-    elSecs.textContent   = "00";
-    elMillis.textContent = "000";
+function setNum(el, value, key){
+  if (prev[key] !== value){
+    el.textContent = value;
+    // Pop animation
+    el.classList.remove("pop");
+    // Force reflow to restart animation reliably
+    // eslint-disable-next-line no-unused-expressions
+    el.offsetHeight;
+    el.classList.add("pop");
+    prev[key] = value;
+  }
+}
+
+function render(diffMs){
+  if (diffMs <= 0){
+    setNum(elDays,   "0",   "d");
+    setNum(elHours,  "00",  "h");
+    setNum(elMins,   "00",  "m");
+    setNum(elSecs,   "00",  "s");
+    setNum(elMillis, "000", "ms");
     clearInterval(timerId);
     return;
   }
 
-  const days = Math.floor(diffMs / 86_400_000); // 1000*60*60*24
-  const remDay = diffMs % 86_400_000;
+  const dayMs = 86_400_000, hrMs = 3_600_000, minMs = 60_000, secMs = 1_000;
 
-  const hours = Math.floor(remDay / 3_600_000);
-  const remHr = remDay % 3_600_000;
+  const days   = Math.floor(diffMs / dayMs);
+  const remDay = diffMs % dayMs;
 
-  const mins = Math.floor(remHr / 60_000);
-  const remMin = remHr % 60_000;
+  const hours  = Math.floor(remDay / hrMs);
+  const remHr  = remDay % hrMs;
 
-  const secs = Math.floor(remMin / 1_000);
-  const millis = Math.floor(remMin % 1_000);
+  const mins   = Math.floor(remHr / minMs);
+  const remMin = remHr % minMs;
 
-  elDays.textContent   = String(days);
-  elHours.textContent  = String(hours).padStart(2, "0");
-  elMins.textContent   = String(mins).padStart(2, "0");
-  elSecs.textContent   = String(secs).padStart(2, "0");
-  elMillis.textContent = String(millis).padStart(3, "0");
+  const secs   = Math.floor(remMin / secMs);
+  const millis = Math.floor(remMin % secMs);
+
+  setNum(elDays,   String(days),                 "d");
+  setNum(elHours,  String(hours).padStart(2,"0"),"h");
+  setNum(elMins,   String(mins).padStart(2,"0"), "m");
+  setNum(elSecs,   String(secs).padStart(2,"0"), "s");
+  setNum(elMillis, String(millis).padStart(3,"0"),"ms");
 }
 
-function tick() {
-  const now = Date.now();
-  render(TARGET - now);
+function tick(){
+  render(TARGET - Date.now());
 }
 
-// Start automatically on page load
+// Start
 timerId = setInterval(tick, TICK_MS);
-tick(); // immediate first paint
+tick();
 
-// ======================
-// Music Toggle (play/pause on user tap)
-// ======================
+// ===== Music toggle (requires user gesture) =====
 toggleBtn.addEventListener("click", async () => {
-  try {
-    if (music.paused) {
-      await music.play();            // user gesture → allowed
-      toggleBtn.textContent = "⏸ Pause Music";
-    } else {
+  try{
+    if (music.paused){
+      await music.play();
+      toggleBtn.querySelector(".btn__text").textContent = "Pause Music";
+    }else{
       music.pause();
-      toggleBtn.textContent = "🎵 Play Music";
+      toggleBtn.querySelector(".btn__text").textContent = "Play Music";
     }
-  } catch (err) {
-    // In case of any browser restriction
+  }catch(err){
     console.log("Music play blocked:", err);
-    toggleBtn.textContent = "🎵 Play Music";
   }
 });
