@@ -15,16 +15,14 @@ const elMillis = document.getElementById("millis");
 const music     = document.getElementById("bgMusic");
 const toggleBtn = document.getElementById("toggleMusic");
 
-// Animate only when changed
 let prev = { d:null, h:null, m:null, s:null, ms:null };
 let timerId = null;
 
 function setNum(el, value, key){
   if (prev[key] !== value){
     el.textContent = value;
-    el.classList.remove("pop"); // restart CSS animation
-    // Force reflow
-    void el.offsetWidth;
+    el.classList.remove("pop");
+    void el.offsetWidth; // restart CSS animation
     el.classList.add("pop");
     prev[key] = value;
   }
@@ -41,8 +39,7 @@ function render(diffMs){
     return;
   }
 
-  const day = 86_400_000, hr = 3_600_000, min = 60_000, sec = 1_000;
-
+  const day=86_400_000, hr=3_600_000, min=60_000, sec=1_000;
   const days  = Math.floor(diffMs / day);
   const hRem  = diffMs % day;
   const hours = Math.floor(hRem / hr);
@@ -65,7 +62,7 @@ function tick(){ render(TARGET - Date.now()); }
 timerId = setInterval(tick, TICK_MS);
 tick();
 
-// Music toggle (requires user gesture on mobile)
+// ===== Music toggle (requires user gesture) =====
 toggleBtn.addEventListener("click", async () => {
   try{
     if (music.paused){

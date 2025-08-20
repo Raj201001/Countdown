@@ -1,21 +1,12 @@
 :root{
-  /* Background gradient palette */
-  --bg1:#ff9a9e;   /* soft rose */
-  --bg2:#fecfef;   /* blush */
-  --bg3:#f6d365;   /* peach */
-  --bg4:#fda085;   /* apricot */
-
-  /* Accent & ink */
   --accent:#e85d78;
   --ink:#16161a;
   --muted:#6b6b76;
-
-  /* Card/glass */
   --glass:#ffffffa8;
   --glass-2:#ffffffd8;
   --shadow:0 14px 48px rgba(0,0,0,.18);
 
-  /* Gradient for text/numbers */
+  /* Gradient for text/numbers/button */
   --gradA:#ff7aa2;
   --gradB:#e85d78;
   --gradC:#d64e90;
@@ -23,7 +14,6 @@
 
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-
 body{
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color:var(--ink);
@@ -33,28 +23,38 @@ body{
   padding:20px;
 }
 
-/* ===== Animated multi-layer gradient background ===== */
-.bg{
-  position:fixed; inset:-20% -10%;
-  background:
-    radial-gradient(60% 60% at 20% 30%, var(--bg1) 0%, transparent 60%),
-    radial-gradient(50% 50% at 80% 20%, var(--bg2) 0%, transparent 60%),
-    radial-gradient(70% 70% at 50% 90%, var(--bg3) 0%, transparent 70%),
-    radial-gradient(60% 60% at 0% 100%, var(--bg4) 0%, transparent 70%);
-  filter: blur(50px) saturate(1.06);
-  animation: float 26s linear infinite;
-  z-index:-3;
+/* ===== Fullscreen background slideshow ===== */
+.slideshow{
+  position:fixed; inset:0; z-index:-3; overflow:hidden;
 }
-.bg-2{ animation-duration: 36s; animation-direction: reverse; opacity:.6 }
-.bg-3{ animation-duration: 46s; opacity:.4 }
+.slide{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  opacity:0; 
+  transform: scale(1.05); /* subtle parallax feel */
+  animation: fadeCycle 16s infinite;
+}
+.s1{ animation-delay: 0s; }
+.s2{ animation-delay: 8s; }
+/* If you add s3, s4 ... stagger delay by +8s each (and adjust keyframes total if many). */
 
-@keyframes float{
-  0%   { transform: translate3d(0,0,0) scale(1) }
-  50%  { transform: translate3d(-4%, 3%, 0) scale(1.03) }
-  100% { transform: translate3d(0,0,0) scale(1) }
+@keyframes fadeCycle{
+  0%   { opacity:0; transform:scale(1.05) }
+  6%   { opacity:1; transform:scale(1.02) }
+  44%  { opacity:1; transform:scale(1.00) }
+  50%  { opacity:0; transform:scale(1.0) }
+  100% { opacity:0; }
 }
 
-/* ===== Glassmorphism Card with gradient border ===== */
+/* Dark/soft backdrop so text stays readable */
+.backdrop{
+  position:absolute; inset:0;
+  background: radial-gradient(120% 120% at 50% 20%, rgba(0,0,0,.12), rgba(0,0,0,.45));
+  backdrop-filter: blur(1.5px);
+}
+
+/* ===== Glass card ===== */
 .card{
   width:min(96vw, 780px);
   background: linear-gradient(180deg, var(--glass), var(--glass-2));
@@ -79,10 +79,7 @@ body{
 }
 
 /* ===== Header ===== */
-.title{
-  margin: 4px 0 8px 0;
-  line-height: 1.25;
-}
+.title{ margin:4px 0 8px; line-height:1.25 }
 .names{
   display:block;
   font-family:"Playfair Display", serif;
@@ -91,21 +88,19 @@ body{
 }
 .heart{ color:var(--accent) }
 .tagline{
-  display:block;
-  margin-top:6px;
+  display:block; margin-top:6px;
   font:600 clamp(.95rem, 1.4vw + .65rem, 1.15rem)/1 Inter, sans-serif;
-  color:#2c2c34;
-  opacity:.95;
+  color:#2c2c34; opacity:.95;
 }
 
-/* ===== Gradient text utility ===== */
+/* Gradient text utilities */
 .gradient-text{
   background: linear-gradient(135deg, var(--gradA), var(--gradB) 55%, var(--gradC));
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent;
 }
 
-/* ===== Ring accent ===== */
+/* Ring */
 .ring{
   font-size: 2rem;
   margin: 10px auto 14px;
@@ -124,32 +119,29 @@ body{
   margin: 8px 0 18px;
 }
 .unit{
-  background: #fff;
-  border-radius: 16px;
-  padding: 14px 8px 12px;
-  position: relative;
+  background:#fff;
+  border-radius:16px;
+  padding:14px 8px 12px;
+  position:relative;
   box-shadow: inset 0 0 0 1px rgba(0,0,0,.05), 0 1px 10px rgba(0,0,0,.05);
 }
 .unit::after{
   content:"";
-  position:absolute; inset:-1px;
-  border-radius:16px;
+  position:absolute; inset:-1px; border-radius:16px;
   background: linear-gradient(140deg, rgba(232,93,120,.16), rgba(255,255,255,0));
   z-index:-1;
 }
 
-/* Gradient numbers + pop animation */
 .num{
   display:block;
-  font-weight:800;
-  line-height:1;
-  transform: translateZ(0);
+  font-weight:800; line-height:1; transform: translateZ(0);
   background: linear-gradient(135deg, var(--gradA), var(--gradB) 55%, var(--gradC));
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent;
   font-size: clamp(1.8rem, 4.2vw + .35rem, 3rem);
 }
 .num.small{ font-size: clamp(1.15rem, 3.2vw, 1.6rem) }
+
 @keyframes pop {
   0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(232,93,120,0)); }
   40%{ transform: scale(1.08); filter: drop-shadow(0 6px 14px rgba(232,93,120,.25)); }
@@ -165,13 +157,9 @@ body{
 }
 
 /* Quote */
-.quote{
-  margin:6px 0 18px;
-  font-style: italic;
-  color: #3b3b46;
-}
+.quote{ margin:6px 0 18px; font-style:italic; color:#f3f3f7; mix-blend-mode:normal }
 
-/* Gradient button */
+/* Button */
 .btn{
   appearance:none; border:none; cursor:pointer;
   display:inline-flex; align-items:center; gap:.55rem;
@@ -193,5 +181,6 @@ body{
 
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce){
-  .bg, .bg-2, .bg-3, .num.pop { animation: none !important; }
+  .slide{ animation: none !important; opacity: 1 !important; transform:none !important; }
+  .num.pop { animation: none !important; }
 }
