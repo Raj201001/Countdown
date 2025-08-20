@@ -4,85 +4,25 @@
   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Countdown with Music</title>
-        <style>
-            body {
-                  display: flex;
-                        flex-direction: column;
-                              justify-content: center;
-                                    align-items: center;
-                                          height: 100vh;
-                                                margin: 0;
-                                                      background: linear-gradient(to right, #6a11cb, #2575fc);
-                                                            color: white;
-                                                                  font-family: Arial, sans-serif;
-                                                                        text-align: center;
-                                                                            }
+        <link rel="stylesheet" href="style.css">
+        </head>
+        <body>
+          <div class="container">
+              <h1>Countdown to the Event</h1>
+                  <div id="countdown">
+                        <span id="days">00</span>d :
+                              <span id="hours">00</span>h :
+                                    <span id="minutes">00</span>m :
+                                          <span id="seconds">00</span>s
+                                              </div>
+                                                  <button id="musicToggle">▶ Play Music</button>
+                                                    </div>
 
-                                                                                h1 {
-                                                                                      font-size: 3rem;
-                                                                                            margin-bottom: 20px;
-                                                                                                }
+                                                      <audio id="bgMusic" loop>
+                                                          <source src="music.mp3" type="audio/mpeg">
+                                                              Your browser does not support the audio element.
+                                                                </audio>
 
-                                                                                                    #countdown {
-                                                                                                          font-size: 2.5rem;
-                                                                                                                font-weight: bold;
-                                                                                                                      margin-bottom: 30px;
-                                                                                                                          }
-
-                                                                                                                              button {
-                                                                                                                                    padding: 12px 25px;
-                                                                                                                                          font-size: 1.2rem;
-                                                                                                                                                border: none;
-                                                                                                                                                      border-radius: 8px;
-                                                                                                                                                            background: #ff9800;
-                                                                                                                                                                  color: white;
-                                                                                                                                                                        cursor: pointer;
-                                                                                                                                                                              transition: 0.3s;
-                                                                                                                                                                                  }
-
-                                                                                                                                                                                      button:hover {
-                                                                                                                                                                                            background: #e68900;
-                                                                                                                                                                                                }
-                                                                                                                                                                                                  </style>
-                                                                                                                                                                                                  </head>
-                                                                                                                                                                                                  <body>
-                                                                                                                                                                                                    <h1>Countdown Timer</h1>
-                                                                                                                                                                                                      <div id="countdown">10</div>
-                                                                                                                                                                                                        <button id="startBtn">Start Countdown & Music</button>
-
-                                                                                                                                                                                                          <!-- Background music file -->
-                                                                                                                                                                                                            <audio id="bgMusic" src="music.mp3"></audio>
-
-                                                                                                                                                                                                              <script>
-                                                                                                                                                                                                                  const countdownEl = document.getElementById("countdown");
-                                                                                                                                                                                                                      const startBtn = document.getElementById("startBtn");
-                                                                                                                                                                                                                          const bgMusic = document.getElementById("bgMusic");
-
-                                                                                                                                                                                                                              let countdown;
-                                                                                                                                                                                                                                  let timerRunning = false;
-
-                                                                                                                                                                                                                                      startBtn.addEventListener("click", () => {
-                                                                                                                                                                                                                                            if (timerRunning) return; // prevent double-start
-                                                                                                                                                                                                                                                  timerRunning = true;
-
-                                                                                                                                                                                                                                                        // Play music on user interaction (required for Android Chrome)
-                                                                                                                                                                                                                                                              bgMusic.play().catch(err => {
-                                                                                                                                                                                                                                                                      console.log("Music play error:", err);
-                                                                                                                                                                                                                                                                            });
-
-                                                                                                                                                                                                                                                                                  let timeLeft = 10;
-                                                                                                                                                                                                                                                                                        countdownEl.textContent = timeLeft;
-
-                                                                                                                                                                                                                                                                                              countdown = setInterval(() => {
-                                                                                                                                                                                                                                                                                                      timeLeft--;
-                                                                                                                                                                                                                                                                                                              countdownEl.textContent = timeLeft;
-
-                                                                                                                                                                                                                                                                                                                      if (timeLeft <= 0) {
-                                                                                                                                                                                                                                                                                                                                clearInterval(countdown);
-                                                                                                                                                                                                                                                                                                                                          countdownEl.textContent = "Time's up!";
-                                                                                                                                                                                                                                                                                                                                                  }
-                                                                                                                                                                                                                                                                                                                                                        }, 1000);
-                                                                                                                                                                                                                                                                                                                                                            });
-                                                                                                                                                                                                                                                                                                                                                              </script>
-                                                                                                                                                                                                                                                                                                                                                              </body>
-                                                                                                                                                                                                                                                                                                                                                              </html>
+                                                                  <script src="script.js"></script>
+                                                                  </body>
+                                                                  </html>

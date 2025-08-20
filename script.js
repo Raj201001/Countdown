@@ -1,53 +1,41 @@
-// Countdown
-const targetDate = new Date("November 26, 2025 00:00:00").getTime();
-const daysEl = document.getElementById("days");
-const hoursEl = document.getElementById("hours");
-const minutesEl = document.getElementById("minutes");
-const secondsEl = document.getElementById("seconds");
-const msEl = document.getElementById("ms");
+// Set your target date here
+const targetDate = new Date("2025-12-31T23:59:59").getTime();
 
 function updateCountdown() {
   const now = new Date().getTime();
     const distance = targetDate - now;
 
       if (distance < 0) {
-          daysEl.textContent = "0";
-              hoursEl.textContent = "0";
-                  minutesEl.textContent = "0";
-                      secondsEl.textContent = "0";
-                          msEl.textContent = "0";
-                              return;
-                                }
+          document.getElementById("countdown").innerHTML = "🎉 The event has started!";
+              clearInterval(countdownTimer);
+                  return;
+                    }
 
-                                  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                                      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                                        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                                          const ms = Math.floor(distance % 1000);
+                      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                                            daysEl.textContent = days;
-                                              hoursEl.textContent = hours;
-                                                minutesEl.textContent = minutes;
-                                                  secondsEl.textContent = seconds;
-                                                    msEl.textContent = ms;
-                                                    }
+                              document.getElementById("days").textContent = days.toString().padStart(2, "0");
+                                document.getElementById("hours").textContent = hours.toString().padStart(2, "0");
+                                  document.getElementById("minutes").textContent = minutes.toString().padStart(2, "0");
+                                    document.getElementById("seconds").textContent = seconds.toString().padStart(2, "0");
+                                    }
 
-                                                    // Update every 50ms
-                                                    setInterval(updateCountdown, 50);
+                                    // Start countdown automatically when page loads
+                                    const countdownTimer = setInterval(updateCountdown, 1000);
+                                    updateCountdown(); // run immediately on load
 
-                                                    // Music toggle
-                                                    const music = document.getElementById("bgMusic");
-                                                    const musicBtn = document.getElementById("musicBtn");
+                                    // Music toggle button
+                                    const music = document.getElementById("bgMusic");
+                                    const musicToggle = document.getElementById("musicToggle");
 
-                                                    let isPlaying = false;
-
-                                                    musicBtn.addEventListener("click", () => {
-                                                      if (isPlaying) {
-                                                          music.pause();
-                                                              musicBtn.textContent = "🎵 Play Music";
-                                                                } else {
-                                                                    music.play().catch(err => console.log("Autoplay blocked:", err));
-                                                                        musicBtn.textContent = "⏸ Pause Music";
-                                                                          }
-                                                                            isPlaying = !isPlaying;
-                                                                            });
+                                    musicToggle.addEventListener("click", () => {
+                                      if (music.paused) {
+                                          music.play();
+                                              musicToggle.textContent = "⏸ Pause Music";
+                                                } else {
+                                                    music.pause();
+                                                        musicToggle.textContent = "▶ Play Music";
+                                                          }
+                                                          });
