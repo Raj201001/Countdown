@@ -1,18 +1,27 @@
 :root{
-  --bg1:#ff9a9e;      /* soft rose */
-  --bg2:#fecfef;      /* blush */
-  --bg3:#f6d365;      /* peach */
-  --accent:#e85d78;   /* romantic raspberry */
-  --ink:#1e1e24;
+  /* Background gradient palette */
+  --bg1:#ff9a9e;   /* soft rose */
+  --bg2:#fecfef;   /* blush */
+  --bg3:#f6d365;   /* peach */
+  --bg4:#fda085;   /* apricot */
+
+  /* Accent & ink */
+  --accent:#e85d78;
+  --ink:#16161a;
   --muted:#6b6b76;
-  --card:#ffffffcc;
-  --glass:#ffffffa6;
-  --shadow:0 12px 40px rgba(0,0,0,.18);
-  --ring-glow:0 0 0 10px rgba(232,93,120,.08), 0 0 40px rgba(232,93,120,.25);
+
+  /* Card/glass */
+  --glass:#ffffffa8;
+  --glass-2:#ffffffd8;
+  --shadow:0 14px 48px rgba(0,0,0,.18);
+
+  /* Gradient for text/numbers */
+  --gradA:#ff7aa2;
+  --gradB:#e85d78;
+  --gradC:#d64e90;
 }
 
 *{box-sizing:border-box}
-
 html,body{height:100%;margin:0}
 
 body{
@@ -21,101 +30,132 @@ body{
   display:grid;
   place-items:center;
   overflow:hidden;
+  padding:20px;
 }
 
-/* ===== Animated gradient background (3 layers) ===== */
+/* ===== Animated multi-layer gradient background ===== */
 .bg{
   position:fixed; inset:-20% -10%;
-  background: radial-gradient(60% 60% at 20% 30%, var(--bg1) 0%, transparent 60%),
-              radial-gradient(50% 50% at 80% 20%, var(--bg2) 0%, transparent 60%),
-              radial-gradient(70% 70% at 50% 90%, var(--bg3) 0%, transparent 70%);
-  filter: blur(40px) saturate(1.05);
-  animation: float 22s linear infinite;
+  background:
+    radial-gradient(60% 60% at 20% 30%, var(--bg1) 0%, transparent 60%),
+    radial-gradient(50% 50% at 80% 20%, var(--bg2) 0%, transparent 60%),
+    radial-gradient(70% 70% at 50% 90%, var(--bg3) 0%, transparent 70%),
+    radial-gradient(60% 60% at 0% 100%, var(--bg4) 0%, transparent 70%);
+  filter: blur(50px) saturate(1.06);
+  animation: float 26s linear infinite;
   z-index:-3;
 }
-.bg-2{ animation-duration: 30s; animation-direction: reverse; opacity:.6 }
-.bg-3{ animation-duration: 40s; opacity:.4 }
+.bg-2{ animation-duration: 36s; animation-direction: reverse; opacity:.6 }
+.bg-3{ animation-duration: 46s; opacity:.4 }
 
 @keyframes float{
-  0%{ transform: translate3d(0,0,0) scale(1) }
-  50%{ transform: translate3d(-4%, 3%, 0) scale(1.03) }
-  100%{ transform: translate3d(0,0,0) scale(1) }
+  0%   { transform: translate3d(0,0,0) scale(1) }
+  50%  { transform: translate3d(-4%, 3%, 0) scale(1.03) }
+  100% { transform: translate3d(0,0,0) scale(1) }
 }
 
-/* ===== Glass card ===== */
+/* ===== Glassmorphism Card with gradient border ===== */
 .card{
-  width:min(96vw, 760px);
-  background:linear-gradient(180deg, var(--glass), #ffffffdd);
-  backdrop-filter: blur(10px);
-  border-radius:24px;
+  width:min(96vw, 780px);
+  background: linear-gradient(180deg, var(--glass), var(--glass-2));
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
+  padding: 28px 22px;
+  text-align: center;
+  position: relative;
   box-shadow: var(--shadow);
-  padding:28px 22px;
-  text-align:center;
-  position:relative;
-  border:1px solid rgba(255,255,255,.55);
+  border: 1px solid rgba(255,255,255,.55);
+}
+.card::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius:24px;
+  padding:1px;
+  background: linear-gradient(135deg, rgba(255,255,255,.7), rgba(232,93,120,.35));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  pointer-events:none;
 }
 
+/* ===== Header ===== */
 .title{
-  font-family:"Playfair Display", serif;
-  margin:0 0 6px 0;
-  line-height:1.2;
+  margin: 4px 0 8px 0;
+  line-height: 1.25;
 }
 .names{
   display:block;
-  font-size:clamp(1.6rem, 2.2vw + 1.1rem, 2.3rem);
-  color:var(--ink);
+  font-family:"Playfair Display", serif;
+  font-weight:700;
+  font-size: clamp(1.7rem, 2.3vw + 1.2rem, 2.6rem);
 }
-.heart{ color:var(--accent); }
+.heart{ color:var(--accent) }
 .tagline{
   display:block;
-  margin-top:4px;
-  font:600 clamp(.9rem, 1.5vw + .6rem, 1.1rem)/1 Inter, sans-serif;
-  color:#333;
+  margin-top:6px;
+  font:600 clamp(.95rem, 1.4vw + .65rem, 1.15rem)/1 Inter, sans-serif;
+  color:#2c2c34;
+  opacity:.95;
 }
 
-/* Ring accent */
+/* ===== Gradient text utility ===== */
+.gradient-text{
+  background: linear-gradient(135deg, var(--gradA), var(--gradB) 55%, var(--gradC));
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+/* ===== Ring accent ===== */
 .ring{
-  font-size:2.1rem;
-  margin:8px auto 12px;
+  font-size: 2rem;
+  margin: 10px auto 14px;
   width:max-content;
-  padding:6px 12px;
-  border-radius:12px;
-  box-shadow: var(--ring-glow);
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(232,93,120,.12), rgba(255,255,255,.6));
+  box-shadow: 0 0 0 10px rgba(232,93,120,.06), 0 10px 26px rgba(232,93,120,.18);
 }
 
 /* ===== Countdown grid ===== */
 .countdown{
   display:grid;
   grid-template-columns: repeat(5, 1fr);
-  gap:12px;
-  margin:6px 0 18px;
+  gap: 12px;
+  margin: 8px 0 18px;
 }
-
 .unit{
-  background:#fff;
-  border-radius:16px;
-  padding:14px 8px 12px;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,.05), 0 1px 10px rgba(0,0,0,.04);
-  position:relative;
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px 8px 12px;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.05), 0 1px 10px rgba(0,0,0,.05);
 }
-
 .unit::after{
   content:"";
   position:absolute; inset:-1px;
   border-radius:16px;
-  background:linear-gradient(140deg, rgba(232,93,120,.18), rgba(255,255,255,0));
+  background: linear-gradient(140deg, rgba(232,93,120,.16), rgba(255,255,255,0));
   z-index:-1;
 }
 
+/* Gradient numbers + pop animation */
 .num{
   display:block;
   font-weight:800;
-  color:var(--accent);
-  font-size:clamp(1.7rem, 4vw + .4rem, 2.8rem);
   line-height:1;
   transform: translateZ(0);
+  background: linear-gradient(135deg, var(--gradA), var(--gradB) 55%, var(--gradC));
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent;
+  font-size: clamp(1.8rem, 4.2vw + .35rem, 3rem);
 }
-.num.small{ font-size:clamp(1.15rem, 3vw, 1.6rem); letter-spacing:.5px }
+.num.small{ font-size: clamp(1.15rem, 3.2vw, 1.6rem) }
+@keyframes pop {
+  0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(232,93,120,0)); }
+  40%{ transform: scale(1.08); filter: drop-shadow(0 6px 14px rgba(232,93,120,.25)); }
+  100%{ transform: scale(1); filter: drop-shadow(0 0 0 rgba(232,93,120,0)); }
+}
+.num.pop { animation: pop 180ms ease-out; }
 
 .label{
   display:block;
@@ -124,36 +164,29 @@ body{
   color:var(--muted);
 }
 
-/* Subtle pop animation when numbers update */
-@keyframes pop {
-  0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(232,93,120,0)); }
-  40%{ transform: scale(1.08); filter: drop-shadow(0 6px 14px rgba(232,93,120,.25)); }
-  100%{ transform: scale(1); filter: drop-shadow(0 0 0 rgba(232,93,120,0)); }
-}
-.num.pop { animation: pop 180ms ease-out; }
-
+/* Quote */
 .quote{
-  margin:4px 0 16px;
-  font-style:italic;
-  color:#444;
+  margin:6px 0 18px;
+  font-style: italic;
+  color: #3b3b46;
 }
 
-/* Button */
+/* Gradient button */
 .btn{
   appearance:none; border:none; cursor:pointer;
   display:inline-flex; align-items:center; gap:.55rem;
   padding:12px 18px;
-  color:#fff; font-weight:700; font-size:1rem;
-  background: linear-gradient(135deg, #ff7aa2, #e85d78 60%, #d64e90);
-  border-radius:12px;
-  box-shadow: 0 10px 24px rgba(232,93,120,.35);
+  color:#fff; font-weight:800; font-size:1rem;
+  background: linear-gradient(135deg, var(--gradA), var(--gradB) 55%, var(--gradC));
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(232,93,120,.35);
   transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
 }
 .btn:active{ transform: translateY(1px); filter: brightness(.97); }
 .btn__icon{ transform: translateY(-1px); }
 
-/* Responsiveness */
-@media (max-width:560px){
+/* Responsive stacking */
+@media (max-width: 560px){
   .countdown{ grid-template-columns: repeat(3, 1fr); }
   .unit.ms{ grid-column: span 3; }
 }
