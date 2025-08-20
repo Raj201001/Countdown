@@ -3,31 +3,86 @@
 <head>
   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Countdown to 26th Nov 2025 💍</title>
-        <link rel="stylesheet" href="style.css">
-        </head>
-        <body>
-          <div class="container">
-              <h1>Countdown to 26th November 2025</h1>
-                  <div class="ring">💍</div>
-                      <div id="countdown">
-                            <div><span id="days">0</span><br>Days</div>
-                                  <div><span id="hours">0</span><br>Hours</div>
-                                        <div><span id="minutes">0</span><br>Minutes</div>
-                                              <div><span id="seconds">0</span><br>Seconds</div>
-                                                    <div><span id="ms">0</span><br>ms</div>
-                                                        </div>
+      <title>Countdown with Music</title>
+        <style>
+            body {
+                  display: flex;
+                        flex-direction: column;
+                              justify-content: center;
+                                    align-items: center;
+                                          height: 100vh;
+                                                margin: 0;
+                                                      background: linear-gradient(to right, #6a11cb, #2575fc);
+                                                            color: white;
+                                                                  font-family: Arial, sans-serif;
+                                                                        text-align: center;
+                                                                            }
 
-                                                            <p class="quote">"Every love story is beautiful, but ours is my favorite ❤️"</p>
+                                                                                h1 {
+                                                                                      font-size: 3rem;
+                                                                                            margin-bottom: 20px;
+                                                                                                }
 
-                                                                <!-- Music button -->
-                                                                    <button id="musicBtn">🎵 Toggle Music</button>
-                                                                        <audio id="bgMusic" loop>
-                                                                              <source src="music.mp3" type="audio/mpeg">
-                                                                                    Your browser does not support the audio element.
-                                                                                        </audio>
-                                                                                          </div>
+                                                                                                    #countdown {
+                                                                                                          font-size: 2.5rem;
+                                                                                                                font-weight: bold;
+                                                                                                                      margin-bottom: 30px;
+                                                                                                                          }
 
-                                                                                            <script src="script.js"></script>
-                                                                                            </body>
-                                                                                            </html>
+                                                                                                                              button {
+                                                                                                                                    padding: 12px 25px;
+                                                                                                                                          font-size: 1.2rem;
+                                                                                                                                                border: none;
+                                                                                                                                                      border-radius: 8px;
+                                                                                                                                                            background: #ff9800;
+                                                                                                                                                                  color: white;
+                                                                                                                                                                        cursor: pointer;
+                                                                                                                                                                              transition: 0.3s;
+                                                                                                                                                                                  }
+
+                                                                                                                                                                                      button:hover {
+                                                                                                                                                                                            background: #e68900;
+                                                                                                                                                                                                }
+                                                                                                                                                                                                  </style>
+                                                                                                                                                                                                  </head>
+                                                                                                                                                                                                  <body>
+                                                                                                                                                                                                    <h1>Countdown Timer</h1>
+                                                                                                                                                                                                      <div id="countdown">10</div>
+                                                                                                                                                                                                        <button id="startBtn">Start Countdown & Music</button>
+
+                                                                                                                                                                                                          <!-- Background music file -->
+                                                                                                                                                                                                            <audio id="bgMusic" src="music.mp3"></audio>
+
+                                                                                                                                                                                                              <script>
+                                                                                                                                                                                                                  const countdownEl = document.getElementById("countdown");
+                                                                                                                                                                                                                      const startBtn = document.getElementById("startBtn");
+                                                                                                                                                                                                                          const bgMusic = document.getElementById("bgMusic");
+
+                                                                                                                                                                                                                              let countdown;
+                                                                                                                                                                                                                                  let timerRunning = false;
+
+                                                                                                                                                                                                                                      startBtn.addEventListener("click", () => {
+                                                                                                                                                                                                                                            if (timerRunning) return; // prevent double-start
+                                                                                                                                                                                                                                                  timerRunning = true;
+
+                                                                                                                                                                                                                                                        // Play music on user interaction (required for Android Chrome)
+                                                                                                                                                                                                                                                              bgMusic.play().catch(err => {
+                                                                                                                                                                                                                                                                      console.log("Music play error:", err);
+                                                                                                                                                                                                                                                                            });
+
+                                                                                                                                                                                                                                                                                  let timeLeft = 10;
+                                                                                                                                                                                                                                                                                        countdownEl.textContent = timeLeft;
+
+                                                                                                                                                                                                                                                                                              countdown = setInterval(() => {
+                                                                                                                                                                                                                                                                                                      timeLeft--;
+                                                                                                                                                                                                                                                                                                              countdownEl.textContent = timeLeft;
+
+                                                                                                                                                                                                                                                                                                                      if (timeLeft <= 0) {
+                                                                                                                                                                                                                                                                                                                                clearInterval(countdown);
+                                                                                                                                                                                                                                                                                                                                          countdownEl.textContent = "Time's up!";
+                                                                                                                                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                                                                                                                                        }, 1000);
+                                                                                                                                                                                                                                                                                                                                                            });
+                                                                                                                                                                                                                                                                                                                                                              </script>
+                                                                                                                                                                                                                                                                                                                                                              </body>
+                                                                                                                                                                                                                                                                                                                                                              </html>
