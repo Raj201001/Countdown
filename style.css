@@ -1,68 +1,65 @@
 body {
-      font-family: 'Segoe UI', sans-serif;
-        background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-          display: flex;
-            justify-content: center;
-              align-items: center;
-                height: 100vh;
-                  margin: 0;
+      margin: 0;
+        font-family: Arial, sans-serif;
+          background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+            display: flex;
+              justify-content: center;
+                align-items: center;
+                  height: 100vh;
                   }
 
                   .container {
-                    text-align: center;
-                      background: rgba(255, 255, 255, 0.9);
-                        padding: 40px;
-                          border-radius: 20px;
-                            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+                    background: white;
+                      padding: 30px;
+                        border-radius: 20px;
+                          box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+                            text-align: center;
                               max-width: 500px;
-                              }
+                                width: 90%;
+                                }
 
-                              h1 {
-                                margin-bottom: 25px;
+                                h1 {
                                   color: #e63946;
-                                    font-size: 1.8rem;
-                                    }
+                                  }
 
-                                    #countdown {
-                                      display: flex;
-                                        justify-content: space-around;
-                                          margin-bottom: 25px;
-                                          }
-
-                                          #countdown div {
-                                            text-align: center;
+                                  #countdown {
+                                    display: flex;
+                                      justify-content: space-around;
+                                        margin: 20px 0;
+                                          font-size: 1.2rem;
+                                            color: #333;
                                             }
 
                                             #countdown span {
-                                              display: block;
-                                                font-size: 2rem;
+                                              font-size: 2rem;
+                                                font-weight: bold;
                                                   color: #e63946;
                                                   }
 
-                                                  #countdown small {
-                                                    font-size: 0.9rem;
-                                                      color: #444;
-                                                      }
+                                                  .quote {
+                                                    font-style: italic;
+                                                      margin: 15px 0;
+                                                        color: #444;
+                                                        }
 
-                                                      #quote {
-                                                        font-style: italic;
-                                                          margin-top: 20px;
-                                                            font-size: 1.2rem;
-                                                              color: #555;
-                                                              }
+                                                        button {
+                                                          margin-top: 15px;
+                                                            padding: 10px 20px;
+                                                              background-color: #e63946;
+                                                                color: white;
+                                                                  border: none;
+                                                                    border-radius: 10px;
+                                                                      cursor: pointer;
+                                                                        font-size: 1rem;
+                                                                          transition: background 0.3s;
+                                                                          }
 
-                                                              .music-btn {
-                                                                margin-top: 20px;
-                                                                  padding: 10px 15px;
-                                                                    border: none;
-                                                                      border-radius: 10px;
-                                                                        background: #e63946;
-                                                                          color: white;
-                                                                            font-size: 1rem;
-                                                                              cursor: pointer;
-                                                                              }
+                                                                          button:hover {
+                                                                            background-color: #d62828;
+                                                                            }
 
-                                                                              .music-btn:hover {
-                                                                                background: #d62828;
+                                                                            .ring {
+                                                                              font-size: 2rem;
+                                                                                margin: 10px 0;
                                                                                 }
 }

@@ -1,51 +1,53 @@
+// Countdown
+const targetDate = new Date("November 26, 2025 00:00:00").getTime();
+const daysEl = document.getElementById("days");
+const hoursEl = document.getElementById("hours");
+const minutesEl = document.getElementById("minutes");
+const secondsEl = document.getElementById("seconds");
+const msEl = document.getElementById("ms");
+
 function updateCountdown() {
-      const targetDate = new Date("Nov 26, 2025 00:00:00").getTime();
-        const now = new Date().getTime();
-          const diff = targetDate - now;
+  const now = new Date().getTime();
+    const distance = targetDate - now;
 
-            if (diff <= 0) {
-                document.getElementById("countdown").innerHTML = "🎉 The day is here!";
-                    return;
-                      }
+      if (distance < 0) {
+          daysEl.textContent = "0";
+              hoursEl.textContent = "0";
+                  minutesEl.textContent = "0";
+                      secondsEl.textContent = "0";
+                          msEl.textContent = "0";
+                              return;
+                                }
 
-                        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                          const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                              const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                                const milliseconds = Math.floor(diff % 1000);
+                                  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                                          const ms = Math.floor(distance % 1000);
 
-                                  document.getElementById("days").innerText = days;
-                                    document.getElementById("hours").innerText = hours;
-                                      document.getElementById("minutes").innerText = minutes;
-                                        document.getElementById("seconds").innerText = seconds;
-                                          document.getElementById("milliseconds").innerText = milliseconds;
-                                          }
+                                            daysEl.textContent = days;
+                                              hoursEl.textContent = hours;
+                                                minutesEl.textContent = minutes;
+                                                  secondsEl.textContent = seconds;
+                                                    msEl.textContent = ms;
+                                                    }
 
-                                          setInterval(updateCountdown, 1);
+                                                    // Update every 50ms
+                                                    setInterval(updateCountdown, 50);
 
-                                          // Romantic Quotes Rotation
-                                          const quotes = [
-                                            "Every love story is beautiful, but ours is my favorite ❤️",
-                                              "You are my today and all of my tomorrows 💕",
-                                                "Together is my favorite place to be 💑",
-                                                  "I still fall for you every single day 💘",
-                                                    "In your arms is where I belong 🌸"
-                                                    ];
-                                                    let quoteIndex = 0;
+                                                    // Music toggle
+                                                    const music = document.getElementById("bgMusic");
+                                                    const musicBtn = document.getElementById("musicBtn");
 
-                                                    function updateQuote() {
-                                                      document.getElementById("quote").innerText = quotes[quoteIndex];
-                                                        quoteIndex = (quoteIndex + 1) % quotes.length;
-                                                        }
-                                                        setInterval(updateQuote, 5000);
+                                                    let isPlaying = false;
 
-                                                        // Music Toggle
-                                                        function toggleMusic() {
-                                                          const music = document.getElementById("bg-music");
-                                                            if (music.paused) {
-                                                                music.play();
-                                                                  } else {
-                                                                      music.pause();
-                                                                        }
-                                                                        }
-}
+                                                    musicBtn.addEventListener("click", () => {
+                                                      if (isPlaying) {
+                                                          music.pause();
+                                                              musicBtn.textContent = "🎵 Play Music";
+                                                                } else {
+                                                                    music.play().catch(err => console.log("Autoplay blocked:", err));
+                                                                        musicBtn.textContent = "⏸ Pause Music";
+                                                                          }
+                                                                            isPlaying = !isPlaying;
+                                                                            });
