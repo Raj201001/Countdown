@@ -50,6 +50,12 @@ body{
   100% { transform: translate3d(0,0,0) scale(1) }
 }
 
+/* ===== FX Canvas (on top, click-through) ===== */
+.fx-canvas{
+  position: fixed; inset: 0; z-index: 3;
+  pointer-events: none; /* allow clicks to pass to buttons */
+}
+
 /* ===== Glass card (always above gallery) ===== */
 .card{
   width: min(96vw, 780px);
@@ -191,7 +197,6 @@ body{
 .slide{
   position: absolute; inset: 0;
   opacity: 0;
-  /* smoother crossfade + silkier easing */
   transition: opacity 1600ms cubic-bezier(.22,.61,.36,1);
   will-change: opacity, transform;
   backface-visibility: hidden;
@@ -200,10 +205,10 @@ body{
 
 .slide img{
   width: 100%; height: 100%;
-  object-fit: cover;            /* no stretching */
-  object-position: center;      /* nice centering */
+  object-fit: cover;
+  object-position: center;
   transform-origin: center;
-  transform: scale(1.03);       /* gentler Ken Burns start */
+  transform: scale(1.03);
   will-change: transform;
 }
 
@@ -229,7 +234,7 @@ body{
   .unit.ms{ grid-column: span 3; }
 
   .gallery{
-    aspect-ratio: 16 / 10;               /* a bit taller on phones */
+    aspect-ratio: 16 / 10;
     max-height: clamp(140px, 24vh, 240px);
   }
 }
