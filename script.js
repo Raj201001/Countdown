@@ -1,11 +1,10 @@
-// ===== Config =====
+/* ========= Countdown (with ms) ========= */
 // Local device midnight for Nov 26, 2025.
-// To force exact 00:00 IST regardless of device timezone, use:
+// For exact 00:00 IST regardless of device timezone, use:
 // const TARGET = new Date("2025-11-25T18:30:00Z").getTime();
 const TARGET = new Date("2025-11-26T00:00:00").getTime();
-const TICK_MS = 25; // smooth & battery-friendly
+const TICK_MS = 25;
 
-// ===== Elements =====
 const elDays   = document.getElementById("days");
 const elHours  = document.getElementById("hours");
 const elMins   = document.getElementById("minutes");
@@ -27,7 +26,6 @@ function setNum(el, value, key){
     prev[key] = value;
   }
 }
-
 function render(diffMs){
   if (diffMs <= 0){
     setNum(elDays,   "0",   "d");
@@ -38,7 +36,6 @@ function render(diffMs){
     clearInterval(timerId);
     return;
   }
-
   const day=86_400_000, hr=3_600_000, min=60_000, sec=1_000;
   const days  = Math.floor(diffMs / day);
   const hRem  = diffMs % day;
@@ -57,12 +54,10 @@ function render(diffMs){
 }
 
 function tick(){ render(TARGET - Date.now()); }
-
-// Start automatically
 timerId = setInterval(tick, TICK_MS);
 tick();
 
-// ===== Music toggle (requires user gesture) =====
+/* ========= Music toggle ========= */
 toggleBtn.addEventListener("click", async () => {
   try{
     if (music.paused){
@@ -76,3 +71,66 @@ toggleBtn.addEventListener("click", async () => {
     console.log("Music play blocked:", err);
   }
 });
+
+/* ========= Ken Burns Crossfade Slideshow (below the card) ========= */
+const gallery = document.getElementById("gallery");
+const slides  = Array.from(gallery.querySelectorAll(".slide"));
+
+let slideIndex = 0;
+const FADE_MS  = 1100;   // must match CSS transition
+const SHOW_MS  = 6000;   // visible time per slide (excluding fade overlap)
+let slideTimer = null;
+
+function showSlide(next){
+  slides[slideIndex].classList.remove("active");
+  slideIndex = (typeof next === "number") ? next : (slideIndex + 1) % slides.length;
+
+  // Alternate direction by toggling .alt class (applies kb-zoom-alt)
+  slides[slideIndex].classList.toggle("alt", slideIndex % 2 === 1);
+
+  // Activate next
+  slides[slideIndex].classList.add("active");
+}
+
+function startSlideshow(){
+  // safety: if no slides, bail
+  if (!slides.length) return;
+
+  // ensure one active
+  if (!slides.some(s => s.classList.contains("active"))){
+    slides[0].classList.add("active");
+  }
+
+  // auto-advance
+  slideTimer = setInterval(() => {
+    if (!gallery.classList.contains("paused")){
+      showSlide();
+    }
+  }, SHOW_MS);
+}
+
+function pauseSlideshow(){
+  gallery.classList.add("paused");
+}
+function resumeSlideshow(){
+  gallery.classList.remove("paused");
+}
+
+// Pause on hover (desktop)
+gallery.addEventListener("mouseenter", pauseSlideshow);
+gallery.addEventListener("mouseleave", resumeSlideshow);
+
+// Pause on touch hold (mobile)
+let touchPauseTimeout;
+gallery.addEventListener("touchstart", () => {
+  // immediate pause
+  pauseSlideshow();
+  // auto-resume after short delay when touch ends
+}, {passive:true});
+gallery.addEventListener("touchend", () => {
+  // resume after a slight delay to avoid accidental resumes
+  clearTimeout(touchPauseTimeout);
+  touchPauseTimeout = setTimeout(resumeSlideshow, 300);
+});
+
+startSlideshow();

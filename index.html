@@ -2,25 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
   <meta name="theme-color" content="#e85d78" />
   <title>Rituraj & Nadi — Forever Begins 26th November 2025</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;600;800&display=swap"
+    rel="stylesheet"
+  />
 
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Background slideshow -->
-  <div class="slideshow" aria-hidden="true">
-    <!-- Add/remove slides as needed; keep class="slide" -->
-    <img src="photo1.jpg" alt="" class="slide s1" />
-    <img src="photo2.jpg" alt="" class="slide s2" />
-    <!-- Example: <img src="photo3.jpg" alt="" class="slide s3" /> -->
-    <div class="backdrop"></div>
-  </div>
+  <!-- Background gradient layers -->
+  <div class="bg"></div>
+  <div class="bg bg-2"></div>
+  <div class="bg bg-3"></div>
 
   <main class="card" role="main">
     <h1 class="title">
@@ -62,6 +64,20 @@
 
     <audio id="bgMusic" src="music.mp3" preload="auto" loop></audio>
   </main>
+
+  <!-- Slideshow below the card -->
+  <section class="gallery" id="gallery" aria-label="Memories">
+    <figure class="slide active alt">
+      <img src="photo1.jpg" alt="" loading="eager" decoding="async" />
+    </figure>
+    <figure class="slide">
+      <img src="photo2.jpg" alt="" loading="lazy" decoding="async" />
+    </figure>
+    <!-- Add more images if you like:
+    <figure class="slide"><img src="photo3.jpg" alt="" loading="lazy" decoding="async" /></figure>
+    <figure class="slide"><img src="photo4.jpg" alt="" loading="lazy" decoding="async" /></figure>
+    -->
+  </section>
 
   <script src="script.js"></script>
 </body>

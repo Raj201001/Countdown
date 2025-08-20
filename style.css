@@ -17,41 +17,33 @@ html,body{height:100%;margin:0}
 body{
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color:var(--ink);
-  display:grid;
-  place-items:center;
-  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+  overflow-x:hidden;
   padding:20px;
 }
 
-/* ===== Fullscreen background slideshow ===== */
-.slideshow{
-  position:fixed; inset:0; z-index:-3; overflow:hidden;
+/* ===== Animated background (3 layers) ===== */
+.bg{
+  position:fixed; inset:-20% -10%;
+  background:
+    radial-gradient(60% 60% at 20% 30%, #ff9a9e 0%, transparent 60%),
+    radial-gradient(50% 50% at 80% 20%, #fecfef 0%, transparent 60%),
+    radial-gradient(70% 70% at 50% 90%, #f6d365 0%, transparent 70%),
+    radial-gradient(60% 60% at 0% 100%, #fda085 0%, transparent 70%);
+  filter: blur(50px) saturate(1.06);
+  animation: float 26s linear infinite;
+  z-index:-3;
 }
-.slide{
-  position:absolute; inset:0;
-  width:100%; height:100%;
-  object-fit:cover;
-  opacity:0; 
-  transform: scale(1.05); /* subtle parallax feel */
-  animation: fadeCycle 16s infinite;
-}
-.s1{ animation-delay: 0s; }
-.s2{ animation-delay: 8s; }
-/* If you add s3, s4 ... stagger delay by +8s each (and adjust keyframes total if many). */
+.bg-2{ animation-duration: 36s; animation-direction: reverse; opacity:.6 }
+.bg-3{ animation-duration: 46s; opacity:.4 }
 
-@keyframes fadeCycle{
-  0%   { opacity:0; transform:scale(1.05) }
-  6%   { opacity:1; transform:scale(1.02) }
-  44%  { opacity:1; transform:scale(1.00) }
-  50%  { opacity:0; transform:scale(1.0) }
-  100% { opacity:0; }
-}
-
-/* Dark/soft backdrop so text stays readable */
-.backdrop{
-  position:absolute; inset:0;
-  background: radial-gradient(120% 120% at 50% 20%, rgba(0,0,0,.12), rgba(0,0,0,.45));
-  backdrop-filter: blur(1.5px);
+@keyframes float{
+  0%   { transform: translate3d(0,0,0) scale(1) }
+  50%  { transform: translate3d(-4%, 3%, 0) scale(1.03) }
+  100% { transform: translate3d(0,0,0) scale(1) }
 }
 
 /* ===== Glass card ===== */
@@ -78,8 +70,8 @@ body{
   pointer-events:none;
 }
 
-/* ===== Header ===== */
-.title{ margin:4px 0 8px; line-height:1.25 }
+/* Header */
+.title{ margin: 4px 0 8px 0; line-height:1.25 }
 .names{
   display:block;
   font-family:"Playfair Display", serif;
@@ -93,7 +85,7 @@ body{
   color:#2c2c34; opacity:.95;
 }
 
-/* Gradient text utilities */
+/* Gradient text utility */
 .gradient-text{
   background: linear-gradient(135deg, var(--gradA), var(--gradB) 55%, var(--gradC));
   -webkit-background-clip:text; background-clip:text;
@@ -111,7 +103,7 @@ body{
   box-shadow: 0 0 0 10px rgba(232,93,120,.06), 0 10px 26px rgba(232,93,120,.18);
 }
 
-/* ===== Countdown grid ===== */
+/* ===== Countdown ===== */
 .countdown{
   display:grid;
   grid-template-columns: repeat(5, 1fr);
@@ -131,7 +123,6 @@ body{
   background: linear-gradient(140deg, rgba(232,93,120,.16), rgba(255,255,255,0));
   z-index:-1;
 }
-
 .num{
   display:block;
   font-weight:800; line-height:1; transform: translateZ(0);
@@ -141,14 +132,12 @@ body{
   font-size: clamp(1.8rem, 4.2vw + .35rem, 3rem);
 }
 .num.small{ font-size: clamp(1.15rem, 3.2vw, 1.6rem) }
-
 @keyframes pop {
   0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(232,93,120,0)); }
   40%{ transform: scale(1.08); filter: drop-shadow(0 6px 14px rgba(232,93,120,.25)); }
   100%{ transform: scale(1); filter: drop-shadow(0 0 0 rgba(232,93,120,0)); }
 }
 .num.pop { animation: pop 180ms ease-out; }
-
 .label{
   display:block;
   margin-top:6px;
@@ -156,10 +145,12 @@ body{
   color:var(--muted);
 }
 
-/* Quote */
-.quote{ margin:6px 0 18px; font-style:italic; color:#f3f3f7; mix-blend-mode:normal }
-
-/* Button */
+/* Quote & Button */
+.quote{
+  margin:6px 0 18px;
+  font-style: italic;
+  color:#3b3b46;
+}
 .btn{
   appearance:none; border:none; cursor:pointer;
   display:inline-flex; align-items:center; gap:.55rem;
@@ -173,14 +164,59 @@ body{
 .btn:active{ transform: translateY(1px); filter: brightness(.97); }
 .btn__icon{ transform: translateY(-1px); }
 
-/* Responsive stacking */
-@media (max-width: 560px){
-  .countdown{ grid-template-columns: repeat(3, 1fr); }
-  .unit.ms{ grid-column: span 3; }
+/* ===== Slideshow (below the card) ===== */
+.gallery{
+  width:min(96vw, 820px);
+  aspect-ratio: 16 / 6; /* nice, short ribbon */
+  position:relative;
+  border-radius: 18px;
+  overflow:hidden;
+  box-shadow: 0 10px 26px rgba(0,0,0,.18);
+  border: 1px solid rgba(255,255,255,.55);
+}
+.slide{
+  position:absolute; inset:0;
+  opacity:0;
+  transition: opacity 1100ms ease-in-out;
+  will-change: opacity, transform;
+}
+.slide.active{ opacity:1; }
+.slide img{
+  width:100%; height:100%;
+  object-fit: cover;
+  transform-origin: center;
+  transform: scale(1.04);
+}
+.slide.active img{
+  /* Ken Burns default direction */
+  animation: kb-zoom 8s ease-in-out forwards;
+}
+.slide.alt.active img{
+  /* Alternate direction */
+  animation-name: kb-zoom-alt;
 }
 
-/* Respect reduced motion */
+@keyframes kb-zoom{
+  0%   { transform: scale(1.06) translate(0,0) }
+  100% { transform: scale(1.14) translate(2%, -2%) }
+}
+@keyframes kb-zoom-alt{
+  0%   { transform: scale(1.06) translate(0,0) }
+  100% { transform: scale(1.14) translate(-2%, 2%) }
+}
+
+/* Pause effect */
+.gallery.paused .slide.active img{ animation-play-state: paused; }
+
+/* Responsive tweaks */
+@media (max-width:560px){
+  .countdown{ grid-template-columns: repeat(3, 1fr); }
+  .unit.ms{ grid-column: span 3; }
+  .gallery{ aspect-ratio: 16 / 9; } /* taller on phones */
+}
+
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce){
-  .slide{ animation: none !important; opacity: 1 !important; transform:none !important; }
-  .num.pop { animation: none !important; }
+  .bg, .bg-2, .bg-3, .slide.active img, .num.pop { animation: none !important; }
+  .slide{ transition: opacity .3s ease !important; }
 }
